@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Calculator</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#2563EB",
+              secondary: "#7C3AED",
+            },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+              button: "8px",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      :where([class^="ri-"])::before {
+      content: "\f3c2";
+      }
+      .calculator-display {
+      font-family: 'Courier New', monospace;
+      letter-spacing: 0.05em;
+      }
+      .button-press {
+      transform: scale(0.95);
+      transition: transform 0.1s ease;
+      }
+      .history-item {
+      animation: slideIn 0.3s ease-out;
+      }
+      @keyframes slideIn {
+      from {
+      opacity: 0;
+      transform: translateY(-10px);
+      }
+      to {
+      opacity: 1;
+      transform: translateY(0);
+      }
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <div
+      id="welcomePage"
+      class="fixed inset-0 z-[70] bg-gradient-to-br from-primary/5 to-secondary/5 flex flex-col items-center justify-center px-6"
+    >
+      <div
+        class="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mb-6 shadow-lg"
+      >
+        <div
+          class="font-['Montserrat'] text-3xl text-white font-bold tracking-tighter"
+        >
+          R<span class="text-xl translate-y-0.5 inline-block">S</span>
+        </div>
+      </div>
+      <h1
+        class="font-['Montserrat'] text-2xl font-bold text-gray-800 mb-3 text-center"
+      >
+        Welcome to R&S Calc
+      </h1>
+      <p class="text-gray-600 text-center mb-8">
+        Your smart calculator for quick and accurate calculations
+      </p>
+      <button
+        id="startButton"
+        class="bg-gradient-to-r from-primary to-secondary text-white font-semibold py-3 px-8 rounded-button shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+      >
+        Get Started
+      </button>
+      <p class="text-sm text-gray-500 mt-8">By Rawat & Sons Techno</p>
+    </div>
+    <div
+      id="mainContent"
+      class="max-w-md mx-auto bg-gradient-to-b from-indigo-50 to-pink-50 min-h-screen shadow-xl opacity-0 transition-opacity duration-500"
+    >
+      <header
+        class="fixed top-0 w-full max-w-md bg-white/80 backdrop-blur-md shadow-sm z-50"
+      >
+        <div class="flex items-center justify-between p-4">
+          <div class="flex items-center space-x-3">
+            <div
+              class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center font-['Montserrat'] text-white text-lg font-bold tracking-tighter"
+              style="text-shadow: 1px 1px 2px rgba(0,0,0,0.2)"
+            >
+              R<span class="text-sm translate-y-0.5 inline-block">S</span>
+            </div>
+            <h1
+              class="font-['Montserrat'] text-xl text-gray-800 font-bold tracking-tight"
+            >
+              R&S Calc
+            </h1>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button
+              id="historyBtn"
+              class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer"
+            >
+              <i class="ri-history-line text-gray-600 text-lg"></i>
+            </button>
+            <button
+              id="settingsBtn"
+              class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer"
+            >
+              <i class="ri-settings-3-line text-gray-600 text-lg"></i>
+            </button>
+          </div>
+        </div>
+      </header>
+      <main class="pt-20 pb-6">
+        <div class="p-4">
+          <div
+            class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 mb-6 shadow-lg border border-white/10"
+          >
+            <div class="text-right">
+              <div
+                id="previousCalculation"
+                class="text-gray-400 text-sm mb-2 min-h-[20px] calculator-display"
+              ></div>
+              <div
+                id="currentDisplay"
+                class="text-white text-4xl font-light calculator-display min-h-[48px] break-all"
+              >
+                0
+              </div>
+            </div>
+          </div>
+          <div class="text-center mb-4">
+            <p class="text-sm text-gray-500">Designed & Developed by</p>
+            <p
+              class="text-base font-semibold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+            >
+              Rawat & Snong Techno
+            </p>
+          </div>
+          <div class="grid grid-cols-4 gap-3">
+            <button
+              class="calculator-btn bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-4 rounded-button cursor-pointer shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02]"
+              data-action="clear"
+            >
+              AC
+            </button>
+            <button
+              class="calculator-btn bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-4 rounded-button cursor-pointer shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02]"
+              data-action="plusminus"
+            >
+              ±
+            </button>
+            <button
+              class="calculator-btn bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-4 rounded-button cursor-pointer shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02]"
+              data-action="percent"
+            >
+              %
+            </button>
+            <button
+              class="calculator-btn bg-gradient-to-r from-secondary to-secondary/80 hover:from-secondary/90 hover:to-secondary/70 text-white font-medium py-4 rounded-button cursor-pointer shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02]"
+              data-action="divide"
+            >
+              ÷
+            </button>
+            <button
+              class="calculator-btn bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-4 rounded-button cursor-pointer"
+              data-number="7"
+            >
+              7
+            </button>
+            <button
+              class="calculator-btn bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-4 rounded-button cursor-pointer"
+              data-number="8"
+            >
+              8
+            </button>
+            <button
+              class="calculator-btn bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-4 rounded-button cursor-pointer"
+              data-number="9"
+            >
+              9
+            </button>
+            <button
+              class="calculator-btn bg-gradient-to-r from-secondary to-secondary/80 hover:from-secondary/90 hover:to-secondary/70 text-white font-medium py-4 rounded-button cursor-pointer shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02]"
+              data-action="multiply"
+            >
+              ×
+            </button>
+            <button
+              class="calculator-btn bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-4 rounded-button cursor-pointer"
+              data-number="4"
+            >
+              4
+            </button>
+            <button
+              class="calculator-btn bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-4 rounded-button cursor-pointer"
+              data-number="5"
+            >
+              5
+            </button>
+            <button
+              class="calculator-btn bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-4 rounded-button cursor-pointer"
+              data-number="6"
+            >
+              6
+            </button>
+            <button
+              class="calculator-btn bg-gradient-to-r from-secondary to-secondary/80 hover:from-secondary/90 hover:to-secondary/70 text-white font-medium py-4 rounded-button cursor-pointer shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02]"
+              data-action="subtract"
+            >
+              −
+            </button>
+            <button
+              class="calculator-btn bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-4 rounded-button cursor-pointer"
+              data-number="1"
+            >
+              1
+            </button>
+            <button
+              class="calculator-btn bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-4 rounded-button cursor-pointer"
+              data-number="2"
+            >
+              2
+            </button>
+            <button
+              class="calculator-btn bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-4 rounded-button cursor-pointer"
+              data-number="3"
+            >
+              3
+            </button>
+            <button
+              class="calculator-btn bg-gradient-to-r from-secondary to-secondary/80 hover:from-secondary/90 hover:to-secondary/70 text-white font-medium py-4 rounded-button cursor-pointer shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02]"
+              data-action="add"
+            >
+              +
+            </button>
+            <button
+              class="calculator-btn bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-4 rounded-button col-span-2 cursor-pointer"
+              data-number="0"
+            >
+              0
+            </button>
+            <button
+              class="calculator-btn bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-4 rounded-button cursor-pointer"
+              data-action="decimal"
+            >
+              .
+            </button>
+            <button
+              class="calculator-btn bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white font-medium py-4 rounded-button cursor-pointer shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02]"
+              data-action="equals"
+            >
+              =
+            </button>
+          </div>
+          <div class="mt-6 grid grid-cols-4 gap-3">
+            <button
+              class="calculator-btn bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 rounded-button text-sm cursor-pointer"
+              data-action="sqrt"
+            >
+              √
+            </button>
+            <button
+              class="calculator-btn bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 rounded-button text-sm cursor-pointer"
+              data-action="square"
+            >
+              x²
+            </button>
+            <button
+              class="calculator-btn bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 rounded-button text-sm cursor-pointer"
+              data-action="memory-clear"
+            >
+              MC
+            </button>
+            <button
+              class="calculator-btn bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 rounded-button text-sm cursor-pointer"
+              data-action="memory-recall"
+            >
+              MR
+            </button>
+          </div>
+        </div>
+      </main>
+      <div
+        id="historyPanel"
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden"
+      >
+        <div
+          class="absolute right-0 top-0 h-full w-80 bg-white shadow-xl transform translate-x-full transition-transform duration-300"
+          id="historyContent"
+        >
+          <div class="p-4 border-b">
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-semibold text-gray-800">
+                Calculation History
+              </h2>
+              <button
+                id="closeHistory"
+                class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer"
+              >
+                <i class="ri-close-line text-gray-600"></i>
+              </button>
+            </div>
+          </div>
+          <div class="p-4">
+            <div id="historyList" class="space-y-3">
+              <div class="text-center text-gray-500 py-8">
+                <i class="ri-history-line text-4xl mb-2"></i>
+                <p>No calculations yet</p>
+              </div>
+            </div>
+            <button
+              id="clearHistory"
+              class="w-full mt-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-button cursor-pointer"
+            >
+              Clear History
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        id="settingsPanel"
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden"
+      >
+        <div
+          class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl transform translate-y-full transition-transform duration-300"
+          id="settingsContent"
+        >
+          <div class="p-4 border-b">
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-semibold text-gray-800">Settings</h2>
+              <button
+                id="closeSettings"
+                class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer"
+              >
+                <i class="ri-close-line text-gray-600"></i>
+              </button>
+            </div>
+          </div>
+          <div class="p-4 space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-gray-700">Sound Effects</span>
+              <div class="relative">
+                <input type="checkbox" id="soundToggle" class="sr-only" />
+                <div
+                  class="w-12 h-6 bg-gray-300 rounded-full cursor-pointer"
+                  id="soundSwitch"
+                >
+                  <div
+                    class="w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 translate-x-0.5 translate-y-0.5"
+                    id="soundKnob"
+                  ></div>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-gray-700">Vibration</span>
+              <div class="relative">
+                <input
+                  type="checkbox"
+                  id="vibrationToggle"
+                  class="sr-only"
+                  checked
+                />
+                <div
+                  class="w-12 h-6 bg-primary rounded-full cursor-pointer"
+                  id="vibrationSwitch"
+                >
+                  <div
+                    class="w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 translate-x-5 translate-y-0.5"
+                    id="vibrationKnob"
+                  ></div>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-gray-700">Scientific Mode</span>
+              <div class="relative">
+                <input type="checkbox" id="scientificToggle" class="sr-only" />
+                <div
+                  class="w-12 h-6 bg-gray-300 rounded-full cursor-pointer"
+                  id="scientificSwitch"
+                >
+                  <div
+                    class="w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 translate-x-0.5 translate-y-0.5"
+                    id="scientificKnob"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script id="welcome-page">
+      document.addEventListener("DOMContentLoaded", function () {
+        const welcomePage = document.getElementById("welcomePage");
+        const mainContent = document.getElementById("mainContent");
+        const startButton = document.getElementById("startButton");
+        startButton.addEventListener("click", function () {
+          welcomePage.style.opacity = "0";
+          mainContent.style.opacity = "1";
+          setTimeout(() => {
+            welcomePage.style.display = "none";
+          }, 500);
+        });
+      });
+    </script>
+    <script id="calculator-logic">
+      class Calculator {
+        constructor() {
+          this.currentOperand = "";
+          this.previousOperand = "";
+          this.operation = null;
+          this.shouldResetScreen = false;
+          this.memory = 0;
+          this.history = JSON.parse(localStorage.getItem("calculatorHistory")) || [];
+          this.settings = JSON.parse(localStorage.getItem("calculatorSettings")) || {
+            sound: false,
+            vibration: true,
+            scientific: false,
+          };
+        }
+        clear() {
+          this.currentOperand = "";
+          this.previousOperand = "";
+          this.operation = null;
+          this.shouldResetScreen = false;
+        }
+        appendNumber(number) {
+          if (this.shouldResetScreen) {
+            this.currentOperand = "";
+            this.shouldResetScreen = false;
+          }
+          if (number === "." && this.currentOperand.includes(".")) return;
+          this.currentOperand = this.currentOperand.toString() + number.toString();
+        }
+        chooseOperation(operation) {
+          if (this.currentOperand === "") return;
+          if (this.previousOperand !== "") {
+            this.compute();
+          }
+          this.operation = operation;
+          this.previousOperand = this.currentOperand;
+          this.currentOperand = "";
+        }
+        compute() {
+          let computation;
+          const prev = parseFloat(this.previousOperand);
+          const current = parseFloat(this.currentOperand);
+          if (isNaN(prev) || isNaN(current)) return;
+          switch (this.operation) {
+            case "+":
+              computation = prev + current;
+              break;
+            case "−":
+              computation = prev - current;
+              break;
+            case "×":
+              computation = prev * current;
+              break;
+            case "÷":
+              computation = prev / current;
+              break;
+            default:
+              return;
+          }
+          const calculation = `${this.previousOperand} ${this.operation} ${this.currentOperand} = ${computation}`;
+          this.addToHistory(calculation);
+          this.currentOperand = computation;
+          this.operation = null;
+          this.previousOperand = "";
+          this.shouldResetScreen = true;
+        }
+        getDisplayNumber(number) {
+          const stringNumber = number.toString();
+          const integerDigits = parseFloat(stringNumber.split(".")[0]);
+          const decimalDigits = stringNumber.split(".")[1];
+          let integerDisplay;
+          if (isNaN(integerDigits)) {
+            integerDisplay = "";
+          } else {
+            integerDisplay = integerDigits.toLocaleString("en", {
+              maximumFractionDigits: 0,
+            });
+          }
+          if (decimalDigits != null) {
+            return `${integerDisplay}.${decimalDigits}`;
+          } else {
+            return integerDisplay;
+          }
+        }
+        updateDisplay() {
+          const currentDisplay = document.getElementById("currentDisplay");
+          const previousCalculation = document.getElementById("previousCalculation");
+          currentDisplay.textContent =
+            this.getDisplayNumber(this.currentOperand) || "0";
+          if (this.operation != null) {
+            previousCalculation.textContent = `${this.getDisplayNumber(this.previousOperand)} ${this.operation}`;
+          } else {
+            previousCalculation.textContent = "";
+          }
+        }
+        addToHistory(calculation) {
+          this.history.unshift({
+            calculation: calculation,
+            timestamp: new Date().toLocaleString(),
+          });
+          if (this.history.length > 50) {
+            this.history = this.history.slice(0, 50);
+          }
+          localStorage.setItem("calculatorHistory", JSON.stringify(this.history));
+          this.updateHistoryDisplay();
+        }
+        updateHistoryDisplay() {
+          const historyList = document.getElementById("historyList");
+          if (this.history.length === 0) {
+            historyList.innerHTML = `
+      <div class="text-center text-gray-500 py-8">
+      <i class="ri-history-line text-4xl mb-2"></i>
+      <p>No calculations yet</p>
+      </div>
+      `;
+          } else {
+            historyList.innerHTML = this.history
+              .map(
+                (item) => `
+      <div class="history-item bg-gray-50 p-3 rounded-lg">
+      <div class="text-sm text-gray-800 font-mono">${item.calculation}</div>
+      <div class="text-xs text-gray-500 mt-1">${item.timestamp}</div>
+      </div>
+      `,
+              )
+              .join("");
+          }
+        }
+        clearHistory() {
+          this.history = [];
+          localStorage.removeItem("calculatorHistory");
+          this.updateHistoryDisplay();
+        }
+        performSpecialOperation(operation) {
+          const current = parseFloat(this.currentOperand);
+          if (isNaN(current)) return;
+          let result;
+          switch (operation) {
+            case "sqrt":
+              result = Math.sqrt(current);
+              this.addToHistory(`√${current} = ${result}`);
+              break;
+            case "square":
+              result = current * current;
+              this.addToHistory(`${current}² = ${result}`);
+              break;
+            case "percent":
+              result = current / 100;
+              this.addToHistory(`${current}% = ${result}`);
+              break;
+            case "plusminus":
+              result = current * -1;
+              break;
+            default:
+              return;
+          }
+          this.currentOperand = result;
+          this.shouldResetScreen = true;
+        }
+        vibrate() {
+          if (this.settings.vibration && "vibrate" in navigator) {
+            navigator.vibrate(10);
+          }
+        }
+      }
+      const calculator = new Calculator();
+      calculator.updateDisplay();
+      calculator.updateHistoryDisplay();
+    </script>
+    <script id="ui-interactions">
+      document.addEventListener("DOMContentLoaded", function () {
+        const buttons = document.querySelectorAll(".calculator-btn");
+        buttons.forEach((button) => {
+          button.addEventListener("click", function () {
+            this.classList.add("button-press");
+            setTimeout(() => {
+              this.classList.remove("button-press");
+            }, 100);
+            calculator.vibrate();
+            if (this.dataset.number) {
+              calculator.appendNumber(this.dataset.number);
+              calculator.updateDisplay();
+            } else if (this.dataset.action) {
+              handleAction(this.dataset.action);
+            }
+          });
+        });
+        function handleAction(action) {
+          switch (action) {
+            case "clear":
+              calculator.clear();
+              calculator.updateDisplay();
+              break;
+            case "equals":
+              calculator.compute();
+              calculator.updateDisplay();
+              break;
+            case "add":
+            case "subtract":
+            case "multiply":
+            case "divide":
+              const operationMap = {
+                add: "+",
+                subtract: "−",
+                multiply: "×",
+                divide: "÷",
+              };
+              calculator.chooseOperation(operationMap[action]);
+              calculator.updateDisplay();
+              break;
+            case "decimal":
+              calculator.appendNumber(".");
+              calculator.updateDisplay();
+              break;
+            case "sqrt":
+            case "square":
+            case "percent":
+            case "plusminus":
+              calculator.performSpecialOperation(action);
+              calculator.updateDisplay();
+              break;
+            case "memory-clear":
+              calculator.memory = 0;
+              break;
+            case "memory-recall":
+              calculator.currentOperand = calculator.memory.toString();
+              calculator.updateDisplay();
+              break;
+          }
+        }
+      });
+    </script>
+    <script id="panel-controls">
+      document.addEventListener("DOMContentLoaded", function () {
+        const historyBtn = document.getElementById("historyBtn");
+        const historyPanel = document.getElementById("historyPanel");
+        const historyContent = document.getElementById("historyContent");
+        const closeHistory = document.getElementById("closeHistory");
+        const clearHistory = document.getElementById("clearHistory");
+        const settingsBtn = document.getElementById("settingsBtn");
+        const settingsPanel = document.getElementById("settingsPanel");
+        const settingsContent = document.getElementById("settingsContent");
+        const closeSettings = document.getElementById("closeSettings");
+        const confirmDialog = document.createElement("div");
+        confirmDialog.id = "confirmDialog";
+        confirmDialog.className =
+          "fixed inset-0 bg-black bg-opacity-50 z-[60] hidden flex items-center justify-center";
+        confirmDialog.innerHTML = `
+      <div class="bg-white rounded-xl p-6 max-w-sm mx-4 transform transition-transform duration-200 scale-95">
+      <h3 class="text-lg font-semibold text-gray-800 mb-3">Clear History</h3>
+      <p class="text-gray-600 mb-6">Are you sure you want to clear all calculation history? This action cannot be undone.</p>
+      <div class="flex space-x-3">
+      <button id="cancelClearHistory" class="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-button">Cancel</button>
+      <button id="confirmClearHistory" class="flex-1 py-2 bg-red-500 hover:bg-red-600 text-white rounded-button">Clear History</button>
+      </div>
+      </div>
+      `;
+        document.body.appendChild(confirmDialog);
+        historyBtn.addEventListener("click", function () {
+          historyPanel.classList.remove("hidden");
+          setTimeout(() => {
+            historyContent.style.transform = "translateX(0)";
+          }, 10);
+        });
+        closeHistory.addEventListener("click", closeHistoryPanel);
+        historyPanel.addEventListener("click", function (e) {
+          if (e.target === historyPanel) {
+            closeHistoryPanel();
+          }
+        });
+        function closeHistoryPanel() {
+          historyContent.style.transform = "translateX(100%)";
+          setTimeout(() => {
+            historyPanel.classList.add("hidden");
+          }, 300);
+        }
+        clearHistory.addEventListener("click", function () {
+          const dialog = document.getElementById("confirmDialog");
+          dialog.classList.remove("hidden");
+          dialog.querySelector("div").classList.remove("scale-95");
+          dialog.querySelector("div").classList.add("scale-100");
+        });
+        document
+          .getElementById("cancelClearHistory")
+          .addEventListener("click", function () {
+            const dialog = document.getElementById("confirmDialog");
+            dialog.querySelector("div").classList.remove("scale-100");
+            dialog.querySelector("div").classList.add("scale-95");
+            setTimeout(() => {
+              dialog.classList.add("hidden");
+            }, 200);
+          });
+        document
+          .getElementById("confirmClearHistory")
+          .addEventListener("click", function () {
+            calculator.clearHistory();
+            const dialog = document.getElementById("confirmDialog");
+            const content = dialog.querySelector("div");
+            content.innerHTML = `
+      <div class="text-center">
+      <i class="ri-check-line text-5xl text-green-500 mb-3"></i>
+      <h3 class="text-lg font-semibold text-gray-800 mb-2">History Cleared</h3>
+      <p class="text-gray-600 mb-4">All calculation history has been cleared successfully.</p>
+      </div>
+      `;
+            setTimeout(() => {
+              content.classList.remove("scale-100");
+              content.classList.add("scale-95");
+              setTimeout(() => {
+                dialog.classList.add("hidden");
+                calculator.clear();
+                calculator.updateDisplay();
+              }, 200);
+            }, 1000);
+          });
+        document
+          .getElementById("confirmDialog")
+          .addEventListener("click", function (e) {
+            if (e.target === this) {
+              this.querySelector("div").classList.remove("scale-100");
+              this.querySelector("div").classList.add("scale-95");
+              setTimeout(() => {
+                this.classList.add("hidden");
+              }, 200);
+            }
+          });g
+        settingsBtn.addEventListener("click", function () {
+          settingsPanel.classList.remove("hidden");
+          setTimeout(() => {
+            settingsContent.style.transform = "translateY(0)";
+          }, 10);
+        });
+        closeSettings.addEventListener("click", closeSettingsPanel);
+        settingsPanel.addEventListener("click", function (e) {
+          if (e.target === settingsPanel) {
+            closeSettingsPanel();
+          }
+        });
+        function closeSettingsPanel() {
+          settingsContent.style.transform = "translateY(100%)";
+          setTimeout(() => {
+            settingsPanel.classList.add("hidden");
+          }, 300);
+        }
+      });
+    </script>
+    <script id="settings-controls">
+      document.addEventListener("DOMContentLoaded", function () {
+        const soundSwitch = document.getElementById("soundSwitch");
+        const soundKnob = document.getElementById("soundKnob");
+        const vibrationSwitch = document.getElementById("vibrationSwitch");
+        const vibrationKnob = document.getElementById("vibrationKnob");
+        const scientificSwitch = document.getElementById("scientificSwitch");
+        const scientificKnob = document.getElementById("scientificKnob");
+        function updateSwitchState(switchEl, knobEl, isOn) {
+          if (isOn) {
+            switchEl.classList.remove("bg-gray-300");
+            switchEl.classList.add("bg-primary");
+            knobEl.style.transform = "translateX(1.25rem) translateY(0.125rem)";
+          } else {
+            switchEl.classList.remove("bg-primary");
+            switchEl.classList.add("bg-gray-300");
+            knobEl.style.transform = "translateX(0.125rem) translateY(0.125rem)";
+          }
+        }
+        updateSwitchState(soundSwitch, soundKnob, calculator.settings.sound);
+        updateSwitchState(
+          vibrationSwitch,
+          vibrationKnob,
+          calculator.settings.vibration,
+        );
+        updateSwitchState(
+          scientificSwitch,
+          scientificKnob,
+          calculator.settings.scientific,
+        );
+        soundSwitch.addEventListener("click", function () {
+          calculator.settings.sound = !calculator.settings.sound;
+          updateSwitchState(soundSwitch, soundKnob, calculator.settings.sound);
+          localStorage.setItem(
+            "calculatorSettings",
+            JSON.stringify(calculator.settings),
+          );
+        });
+        vibrationSwitch.addEventListener("click", function () {
+          calculator.settings.vibration = !calculator.settings.vibration;
+          updateSwitchState(
+            vibrationSwitch,
+            vibrationKnob,
+            calculator.settings.vibration,
+          );
+          localStorage.setItem(
+            "calculatorSettings",
+            JSON.stringify(calculator.settings),
+          );
+        });
+        scientificSwitch.addEventListener("click", function () {
+          calculator.settings.scientific = !calculator.settings.scientific;
+          updateSwitchState(
+            scientificSwitch,
+            scientificKnob,
+            calculator.settings.scientific,
+          );
+          localStorage.setItem(
+            "calculatorSettings",
+            JSON.stringify(calculator.settings),
+          );
+        });
+      });
+    </script>
+    <script id="keyboard-support">
+      document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("keydown", function (event) {
+          const key = event.key;
+          if (key >= "0" && key <= "9") {
+            calculator.appendNumber(key);
+            calculator.updateDisplay();
+          } else if (key === ".") {
+            calculator.appendNumber(".");
+            calculator.updateDisplay();
+          } else if (key === "+") {
+            calculator.chooseOperation("+");
+            calculator.updateDisplay();
+          } else if (key === "-") {
+            calculator.chooseOperation("−");
+            calculator.updateDisplay();
+          } else if (key === "*") {
+            calculator.chooseOperation("×");
+            calculator.updateDisplay();
+          } else if (key === "/") {
+            event.preventDefault();
+            calculator.chooseOperation("÷");
+            calculator.updateDisplay();
+          } else if (key === "Enter" || key === "=") {
+            calculator.compute();
+            calculator.updateDisplay();
+          } else if (key === "Escape" || key === "c" || key === "C") {
+            calculator.clear();
+            calculator.updateDisplay();
+          } else if (key === "Backspace") {
+            if (calculator.currentOperand.length > 0) {
+              calculator.currentOperand = calculator.currentOperand.slice(0, -1);
+              calculator.updateDisplay();
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
